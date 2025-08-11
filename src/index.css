@@ -3,3 +3,17 @@
 @tailwind utilities;
 
 html, body, #root { height: 100%; }
+:root {
+  /* iOS safe areas */
+  --s-top: env(safe-area-inset-top);
+  --s-right: env(safe-area-inset-right);
+  --s-bottom: env(safe-area-inset-bottom);
+  --s-left: env(safe-area-inset-left);
+}
+body {
+  padding-top: var(--s-top);
+  padding-right: var(--s-right);
+  padding-bottom: var(--s-bottom);
+  padding-left: var(--s-left);
+}
+
