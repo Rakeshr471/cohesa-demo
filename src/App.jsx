@@ -124,7 +124,7 @@ function Header({ tab, setTab }){
           <div className="font-semibold text-xl tracking-tight text-slate-800 dark:text-slate-100">Cohesa</div>
           <span className="ml-2 text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800">Goldman Sachs – Demo</span>
         </div>
-        <nav className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+          <nav className="flex gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 overflow-x-auto whitespace-nowrap [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <TabButton icon={<Users size={16}/>} active={tab === "employee"} onClick={()=>setTab("employee")}>Discover</TabButton>
           <TabButton icon={<BadgeCheck size={16}/>} active={tab === "profile"} onClick={()=>setTab("profile")}>My Profile</TabButton>
           <TabButton icon={<MessageCircle size={16}/>} active={tab === "partner"} onClick={()=>setTab("partner")}>Partners</TabButton>
@@ -317,9 +317,11 @@ function SwipeCard({ person, me, onLeft, onRight }){
     <div className="relative select-none">
       <AnimatePresence mode="popLayout">
         {person ? (
-          <motion.div key={person.id} ref={ref} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}
-            initial={{ opacity:0, y:20, scale:0.98 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:-20, scale:0.98 }} transition={{ type:'spring', stiffness:260, damping:22 }}
-            className="relative bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-6 md:p-7">
+         <motion.div key={person.id} ref={ref} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}
+          style={{ touchAction: 'pan-y' }}
+          initial={{ opacity:0, y:20, scale:0.98 }} animate={{ opacity:1, y:0, scale:1 }} exit={{ opacity:0, y:-20, scale:0.98 }} transition={{ type:'spring', stiffness:260, damping:22 }}
+          className="relative bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 md:p-7"
+>
             <div className="flex items-start gap-5">
               <Avatar name={person.name} src={person.photo} size="xl" />
               <div className="min-w-0">
@@ -363,7 +365,7 @@ function MessagesPanel({ thread, setThread }){
           {!thread.matched && (
             <div className="text-xs text-slate-500">Waiting for mutual match…</div>
           )}
-          <div className="max-h-52 overflow-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 space-y-2">
+          <div className="max-h-[45vh] md:max-h-52 overflow-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 space-y-2">
             {thread.messages.map((m,i)=> (
               <div key={i} className={"text-sm "+(m.from==="You"?"text-slate-800 dark:text-slate-200":"text-slate-600 dark:text-slate-300")}> <span className="font-medium">{m.from}:</span> {m.text}</div>
             ))}
@@ -663,7 +665,7 @@ function tokenRow(name){
 // UI PRIMITIVES
 function Card({ title, children, right }){
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-5">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5">
       <div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2"><Sparkles size={16} className="text-emerald-500"/>{title}</h2>{right}</div>
       <div className="mt-4 space-y-4">{children}</div>
     </div>
@@ -686,10 +688,9 @@ function Field({ label, value, onChange, className }){
   );
 }
 
-function PrimaryButton({ children, onClick }){ return <button onClick={onClick} className="px-4 py-2 rounded-xl bg-emerald-600 text-white shadow hover:bg-emerald-700 flex items-center">{children}</button>; }
-function SecondaryButton({ children, onClick }){ return <button onClick={onClick} className="px-4 py-2 rounded-xl border text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center">{children}</button>; }
-function GhostButton({ children, onClick }){ return <button onClick={onClick} className="px-4 py-2 rounded-xl bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 flex items-center">{children}</button>; }
-
+function PrimaryButton({ children, onClick }){ return <button onClick={onClick} className="min-h-[44px] px-4 py-2 rounded-xl bg-emerald-600 text-white shadow hover:bg-emerald-700 flex items-center">{children}</button>; }
+function SecondaryButton({ children, onClick }){ return <button onClick={onClick} className="min-h-[44px] px-4 py-2 rounded-xl border text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center">{children}</button>; }
+function GhostButton({ children, onClick }){ return <button onClick={onClick} className="min-h-[44px] px-4 py-2 rounded-xl bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-900 flex items-center">{children}</button>; }
 function Avatar({ src, name, size="md" }){
   const sizes={ sm:28, md:36, lg:48, xl:64 }; const s=sizes[size]||36;
   if(src) return <img alt={name} src={src} style={{ width:s, height:s }} className="rounded-2xl object-cover border border-slate-200 dark:border-slate-700"/>;
