@@ -44,6 +44,33 @@ const baseCandidates = [
   { id:"5", name:"Chris Rivera", role:"Analyst", team:"Global Markets", location:"200 West, NYC", interests:["Gaming","Photography","Coffee"], bio:"Learning film photography; museum lunches?", school:"UChicago", photo:"https://i.pravatar.cc/160?img=22" },
 ];
 
+function generateRandomProfile(id) {
+  const names = ["Morgan Lee", "Jamie Carter", "Avery Brooks", "Riley Tran", "Casey Morgan", "Taylor Price"];
+  const roles = ["Analyst", "Associate", "VP", "Director"];
+  const teams = ["IBD – TMT", "IBD – Industrials", "Global Markets", "Asset Management", "Healthcare"];
+  const locations = ["200 West, NYC", "Jersey City", "Chicago", "SF Office"];
+  const interestsList = ["Running", "Coffee", "Photography", "Cooking", "Chess", "Tennis", "Travel", "Bouldering"];
+
+  const name = names[Math.floor(Math.random()*names.length)];
+  const role = roles[Math.floor(Math.random()*roles.length)];
+  const team = teams[Math.floor(Math.random()*teams.length)];
+  const location = locations[Math.floor(Math.random()*locations.length)];
+  const interests = Array.from({length:3}, ()=> interestsList[Math.floor(Math.random()*interestsList.length)]);
+
+  return {
+    id: id.toString(),
+    name,
+    role,
+    team,
+    location,
+    interests,
+    bio: `Hi, I'm ${name}. Always happy to connect over coffee or events.`,
+    school: "University of Example",
+    photo: `https://i.pravatar.cc/160?img=${Math.floor(Math.random()*70)}`,
+  };
+}
+
+
 function AppContainer({ children }){
   const [dark, setDark] = useState(false);
   useEffect(()=>{ document.documentElement.classList.toggle('dark', dark); },[dark]);
