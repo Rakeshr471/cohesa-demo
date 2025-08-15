@@ -195,6 +195,7 @@ function EmployeeSwipeView(){
   const { me, events, setEvents } = useAppState();
 
   const [filters, setFilters] = useState({ query:"", interests:new Set() });
+  const [eventCal, setEventCal] = useState("Google Calendar");
   const candidateDeck = useMemo(()=>{
   let filtered = baseCandidates.filter(c=> {
     const q = filters.query.toLowerCase();
@@ -298,9 +299,13 @@ function EmployeeSwipeView(){
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-slate-500">Calendar:</span>
-              <select className="rounded-lg border px-2 py-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
-                <option>Slack</option>
-                <option>Teams</option>
+              <select
+                value={eventCal}
+                onChange={(e)=>setEventCal(e.target.value)}
+                className="rounded-lg border px-2 py-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+              >
+                <option>Google Calendar</option>
+                <option>Outlook</option>
               </select>
             </div>
             {events.map((e)=> (
@@ -310,7 +315,9 @@ function EmployeeSwipeView(){
                     <div className="font-medium flex items-center gap-2">{e.name} {e.companySponsored && <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-800 dark:text-emerald-300">Company</span>}</div>
                     <div className="text-sm text-slate-500 flex items-center gap-3"><Clock size={14}/> {e.when} <MapPin size={14}/> {e.location}</div>
                   </div>
-                  <GhostButton onClick={()=>addToCalendar("Slack", e)}><Calendar size={16} className="mr-1"/>Add</GhostButton>
+                    <GhostButton onClick={()=>addToCalendar(eventCal, e)}>
+                      <Calendar size={16} className="mr-1"/>Add
+                    </GhostButton>
                 </div>
                 <div className="mt-2 text-sm"><span className="text-slate-500">Attendees:</span> {e.attendees.join(", ")}</div>
               </div>
@@ -401,7 +408,7 @@ function SwipeCard({ person, me, onLeft, onRight }){
 
 function MessagesPanel({ thread, setThread }){
   const [input, setInput] = useState("");
-  const [platform, setPlatform] = useState("Slack");
+  const [platform, setPlatform] = useState("Google Calendar");
   const [inviteTime, setInviteTime] = useState("Thu 12:30 PM");
 
   const send = () => { if(!thread||!input.trim()) return; const next={...thread, messages:[...thread.messages,{from:"You",text:input.trim()}]}; setThread(next); setInput(""); };
@@ -434,9 +441,9 @@ function MessagesPanel({ thread, setThread }){
               <option>Google Calendar</option>
             </select>
             <input value={inviteTime} onChange={(e)=>setInviteTime(e.target.value)} className="rounded-lg border px-2 py-2 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700" />
-            <SecondaryButton onClick={sendInvite}>
-              {thread.matched ? `Send ${platform} calendar invite` : "Invite available after mutual match"}
-            </SecondaryButton>
+              <SecondaryButton onClick={sendInvite}>
+                {thread.matched ? "Send calendar invite" : "Invite available after mutual match"}
+              </SecondaryButton>
           </div>
         </div>
       ) : (
