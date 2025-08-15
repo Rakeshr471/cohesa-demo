@@ -195,30 +195,42 @@ function EmployeeSwipeView(){
   const { me, events, setEvents } = useAppState();
 
   const [filters, setFilters] = useState({ query:"", interests:new Set() });
-  const candidateDeck = useMemo(()=> baseCandidates.filter(c=> {
+  const candidateDeck = useMemo(()=>{
+  let filtered = baseCandidates.filter(c=> {
     const q = filters.query.toLowerCase();
     const hitQ = !q || [c.name,c.role,c.team,c.location,c.school,c.bio].join(" ").toLowerCase().includes(q);
     const interestOk = filters.interests.size===0 || c.interests.some(i=> filters.interests.has(i));
     return hitQ && interestOk;
-  }), [filters]);
-
+  });
+  if (filtered.length < 5) {
+    // Add random profiles until we have at least 10
+    const needed = 10 - filtered.length;
+    for (let i = 0; i < needed; i++) {
+      filtered.push(generateRandomProfile(Date.now()+i));
+    }
+  }
+  return filtered;
+}, [filters]);
   // virtual infinite deck
   const [idx, setIdx] = useState(0);
   const current = candidateDeck[(idx % Math.max(candidateDeck.length,1))] || null;
 
   // messages thread only after mutual
   const [thread, setThread] = useState(null); // { with, matched, messages }
+  const [showConnectionPopup, setShowConnectionPopup] = useState(false);
   const [pendingName, setPendingName] = useState("");
 
   const like = useCallback(()=>{
-    if(!current) return;
-    setPendingName(current.name);
-    setTimeout(()=>{
-      setThread({ with: current, matched: true, messages: [ { from: current.name, text: "It’s a match! Want to grab lunch this week?" } ] });
-      setPendingName("");
-    }, 600);
-    setIdx(i=>i+1);
-  },[current]);
+  if(!current) return;
+  setPendingName(current.name);
+  setTimeout(()=>{
+    setThread({ with: current, matched: true, messages: [ { from: current.name, text: "It’s a match! Want to grab lunch this week?" } ] });
+    setPendingName("");
+    setShowConnectionPopup(true); // trigger popup
+  }, 600);
+  setIdx(i=>i+1);
+},[current]);
+
 
   const pass = useCallback(()=>{ setIdx(i=>i+1); },[]);
 
@@ -306,6 +318,20 @@ function EmployeeSwipeView(){
           </div>
         </Card>
       </div>
+      {showConnectionPopup && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-gradient-to-br from-emerald-500 to-sky-500 text-white rounded-2xl shadow-lg p-6 max-w-sm w-full text-center">
+          <h2 className="text-xl font-semibold mb-2">🎉 New Connection!</h2>
+          <p>You and {thread?.with?.name} are now connected on Cohesa.</p>
+          <button
+            onClick={()=>setShowConnectionPopup(false)}
+            className="mt-4 px-4 py-2 rounded-lg bg-white text-emerald-600 font-medium hover:bg-slate-100"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    )}
     </section>
   );
 }
@@ -404,8 +430,8 @@ function MessagesPanel({ thread, setThread }){
           {/* Calendar invite lives ONLY here after mutual match */}
           <div className="pt-2 flex flex-wrap items-center gap-2">
             <select value={platform} onChange={(e)=>setPlatform(e.target.value)} className="rounded-lg border px-2 py-2 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
-              <option>Slack</option>
-              <option>Teams</option>
+              <option>Outlook</option>
+              <option>Google Calendar</option>
             </select>
             <input value={inviteTime} onChange={(e)=>setInviteTime(e.target.value)} className="rounded-lg border px-2 py-2 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700" />
             <SecondaryButton onClick={sendInvite}>
